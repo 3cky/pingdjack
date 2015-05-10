@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
-import xmlrpc.client
+try:
+    import xmlrpc.client as xmlrpcclient
+except ImportError:
+    import xmlrpclib as xmlrpcclient
 
-class Error(xmlrpc.client.Fault):
+class Error(xmlrpcclient.Fault):
     code = 0
     message = 'Unknown error'
 

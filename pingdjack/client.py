@@ -1,8 +1,17 @@
 # -*- coding:utf-8 -*-
 import re
-from urllib.request import urlopen
-from urllib.parse import urlsplit
-import xmlrpc.client
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+try:
+    from urllib.parse import urlsplit
+except ImportError:
+    from urlparse import urlsplit
+try:
+    import xmlrpc.client as xmlrpcclient
+except ImportError:
+    import xmlrpclib as xmlrpcclient
 from xml.parsers.expat import ExpatError
 
 import html5lib
@@ -45,7 +54,7 @@ def ping(source_url, target_url):
         server_url = info.get('X-Pingback', '') or \
                                   search_link(f.read(512 * 1024))
         if server_url:
-            server = xmlrpc.client.ServerProxy(server_url)
+            server = xmlrpcclient.ServerProxy(server_url)
             server.pingback.ping(source_url, target_url)
     finally:
         f.close()
@@ -60,6 +69,6 @@ def ping_external_urls(source_url, html, root_url):
     for url in external_urls(html, root_url):
         try:
             ping(source_url, url)
-        except (IOError, xmlrpc.client.Error, ExpatError):
+        except (IOError, xmlrpcclient.Error, ExpatError):
             # One failed URL shouldn't block others
             pass
